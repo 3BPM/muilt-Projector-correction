@@ -91,24 +91,27 @@ def check2map(i1,i2):
 def check2scatter(i1,i2):
     # 计算全局最小值和最大值
     # global_min_val = min(np.min(ni1), np.min(ni2))
-    global_min_val = -20
+    x_min_val = -20
 
-    global_max_val = max(np.max(i1), np.max(i2))+20
+    x_max_val = max(np.max(i1[:, 0]), np.max(i2[:, 0]))+20
+    y_min_val = -20
+
+    y_max_val = max(np.max(i1[:, 1]), np.max(i2[:, 1]))+20
     plt.figure(figsize=(10, 5))
     # 设置X轴和Y轴的范围
     plt.subplot(1, 2, 1)
     plt.title('1')
     plt.scatter(i1[:, 0], i1[:, 1], s=1,c='red', label='1 Points')
-    plt.xlim(global_min_val, global_max_val)  # X轴范围从0
-    plt.ylim(global_min_val, global_max_val)  # X轴范围从0
+    plt.xlim(x_min_val, x_max_val)  # X轴范围从0
+    plt.ylim(y_min_val, y_max_val)  # X轴范围从0
     
     plt.legend()
     # plt.axis('equal')
     plt.subplot(1, 2, 2)
     plt.title('2')
     plt.scatter(i2[:, 0], i2[:, 1], s=1,c='blue', label='2 Points')
-    plt.xlim(global_min_val, global_max_val)  # X轴范围从0
-    plt.ylim(global_min_val, global_max_val)  # X轴范围从0
+    plt.xlim(x_min_val, x_max_val)  # X轴范围从0
+    plt.ylim(y_min_val, y_max_val)  # X轴范围从0
     plt.legend()
     # plt.show()
 
