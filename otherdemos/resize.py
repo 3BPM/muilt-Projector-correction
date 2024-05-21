@@ -52,10 +52,10 @@ def dotmatrix(size,r=3,c=5):  #N,2的数组
             y=y+dy
             x =0
         return np.array(result)
-def fourdotclock(size):  
+def fourdotclock(size):
     pts2 = np.float32([[0,0],[size[0],0],[size[0],size[1]],[0,size[1]]])
     return pts2
-def fourdot(size):  
+def fourdot(size):
     pts2 = np.float32([[0,0],[size[0],0],[0,size[1]],[size[0],size[1]]])
     return pts2
 def resize_image(image_path, ratio=0.2):
@@ -199,6 +199,7 @@ def check2map(i1,i2):
 def check2scatter(i1,i2,issub=False):
     # 计算全局最小值和最大值
     # global_min_val = min(np.min(ni1), np.min(ni2))
+
         # 复制并过滤nan
     ni1 = i1.copy()
     ni1[np.isnan(ni1)] = 0
