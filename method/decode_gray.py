@@ -17,7 +17,47 @@ def gray_decoder(gray):
         if tmp:
             dec += 2 ** (len(gray) - i - 1)
     return dec
+def graydecoder(gray):
+    """
+    将二进制数转换为十进制数
 
+    Args:
+        gray: 输入的二进制数，表示为列表
+
+    Returns:
+        int: 转换后的十进制数
+    """
+    dec = 0
+    for i, bit in enumerate(gray[::-1]):
+        if bit:
+            dec += 2 ** i
+    return dec
+def gray_to_d(gray_code):
+    """
+    将格雷码解码为二进制数
+
+    Args:
+        gray_code: 格雷码字符串
+
+    Returns:
+        str: 二进制数字符串
+    """
+    result = [0] * len(gray_code)
+    bit = int(gray_code[0])
+    result[0] = bit
+
+    for i in range(1, len(gray_code)):
+        bit = int(gray_code[i])
+        result[i] = bit ^ result[i - 1]
+
+    return int(''.join(str(x) for x in result),2)
+
+
+
+def gray_to_decimal(gray_code):
+    binary_code = int(gray_code, 2)
+    decimal_code = binary_code ^ (binary_code >> 1)
+    return decimal_code
 # Filter out matching points and record
 def gray_decode(images,pro_size, parameters):
     n_cols, n_rows = computeNumberOfPatternImages(pro_size[0], pro_size[1])

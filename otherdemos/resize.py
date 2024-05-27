@@ -1,10 +1,13 @@
 from PIL import Image
 import matplotlib.pyplot as plt
-import cv2, numpy as np
+import math
+import cv2,os, numpy as np
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, box,MultiPolygon
 from shapely.ops import unary_union
 # 创建一个大图，其中包含所有gray_col[index]的子图
+
+
 def split_image(image):
     width, height = image.size
     left_half = image.crop((0, 0, width // 2, height))
@@ -40,8 +43,8 @@ def findcontours(shadow_mask):
     plt.xlabel('X coordinate')
     plt.ylabel('Y coordinate')
 def dotmatrix(size,r=3,c=5):  #N,2的数组
-        dx=size[0]/(c-1)
-        dy=size[1]/(r-1)
+        dx=size[1]/(c-1)
+        dy=size[0]/(r-1)
         x=0
         y=0
         result=[]
@@ -106,10 +109,23 @@ def plt_show_array(name,array):#必须是（xxx,2)的array
     plt.legend()
     plt.grid(True)
     plt.show()
-def plt_show_withbox(img,array):
-    imgwb1 = cv2.polylines(img, [np.int32(array)], True, (0, 255, 0), 1)
+def plt_show_withbox1(img, array):
+    plt.plot(np.int32(array)[:,0], np.int32(array)[:,1], color='g', linewidth=1)
     plt.figure(figsize=(20, 20))
-    plt_show("withbox",imgwb1)
+    plt.imshow(img)
+    plt.show()
+
+def plt_show_withbox(img,array):
+    img2 =cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    cv2.polylines(img2, [np.int32(array)], True, (0, 255, 0), 1)
+    plt.figure(figsize=(20, 20))
+    plt_show("withbox",img2)
+def plt_show_pts(img,pts,BGRcolor=(0, 0, 255)):
+    img2 = img.copy()
+    for num in pts:
+        if(not math.isnan(num[0])):
+            cv2.circle(img2, (int(num[0]), int(num[1])), 5, BGRcolor, -1)
+    plt_show("with points",img2)
 def draw1map(points):
     """注意生成的图像会大于点10像素 输入N,2
 
@@ -133,7 +149,7 @@ def check1map(i1):
     ni1 = i1.copy()
     ni1[np.isnan(ni1)] = 0
     plt.title('1')
-    plt.imshow(i1)
+    plt.imshow(i1, cmap='gray')
     min_y, min_x = np.unravel_index(ni1.argmin(), ni1.shape)
     max_y, max_x = np.unravel_index(ni1.argmax(), ni1.shape)
     plt.plot(min_x, min_y, 'ro')
@@ -143,7 +159,7 @@ def check1map(i1):
     plt.colorbar()
     plt.axis('equal')
     return np.max(ni1)
-def check2map(i1,i2):
+def check2map(i1,i2,cmaptype='viridis'):#gray
     plt.figure(figsize=(10, 5))
 
     # 复制并过滤nan
@@ -163,7 +179,7 @@ def check2map(i1,i2):
     # 第一个子图
     plt.subplot(1, 2, 1)
     plt.title('1')
-    plt.imshow(i1)
+    plt.imshow(i1,cmap=cmaptype)
 
     plt.plot(min_x, min_y, 'ro')
     plt.text(min_x, min_y, 'min:' + str(min_value), fontsize=12)
@@ -185,7 +201,7 @@ def check2map(i1,i2):
     # 第二个子图
     plt.subplot(1, 2, 2)
     plt.title('2')
-    plt.imshow(i2)
+    plt.imshow(i2,cmap=cmaptype)
 
 
     plt.plot(min_x, min_y, 'ro')
@@ -217,6 +233,7 @@ def check2scatter(i1,i2,issub=False):
         axs[0].scatter(i1[:, 0], i1[:, 1], s=1, c='red', label='pro Points')
         axs[0].set_xlim(global_min_val, global_max_val)
         axs[0].set_ylim(global_min_val, global_max_val)
+        axs[0].invert_yaxis()  # 反转Y轴方向
         axs[0].legend()
 
         axs[1].set_title('2')
@@ -298,7 +315,13 @@ def find_enclosing_rectangle(points):
                                 max_area = area
                                 best_rect = candidate_rect
         return best_rect
-
+def load_images_from_folder(folder):
+    images = []
+    for filename in sorted(os.listdir(folder)):
+        img = cv2.imread(os.path.join(folder, filename), cv2.IMREAD_GRAYSCALE)
+        if img is not None:
+            images.append(img)
+    return images
 if __name__ == "__main__":
     # re=resize_image("pic1920_1080.png",0.3)
     # re.save("pic0.3.png")

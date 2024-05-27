@@ -34,7 +34,7 @@ def pro_cam_match(cmr_match_pjt, cam_size):
     return map_matrix
 
 # Matching of the projector image plane and the calibrated points in the projected image
-def pro_real_match(matrix, anchors, ph_coordinate):
+def pro_real_match(matrix, anchors, copytxt):
     cam_know = [] # The position of the Aruco code in the image plane of the camera
     idx_Aruco = [] # Aruco code number
     for key, value in anchors.items():
@@ -47,7 +47,7 @@ def pro_real_match(matrix, anchors, ph_coordinate):
         pro_real[idx_Aruco[n]] = np.array([(matrix[0][m[0]][m[1]]), (matrix[1][m[0]][m[1]])])
     # Reading calibrated projected image coordinates
     real_dic = {} # Aruco code in the coordinates of the projected image and its corresponding id
-    real_np = np.loadtxt(ph_coordinate, encoding='utf-8', dtype=float)
+    real_np = np.loadtxt(copytxt, encoding='utf-8', dtype=float)
     for i in real_np:
         real_dic[i[0]] = [i[1], i[2]]
     pro = [] # Pixel coordinates of points in the projector that match the projected image
