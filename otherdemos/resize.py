@@ -6,7 +6,46 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, box,MultiPolygon
 from shapely.ops import unary_union
 # 创建一个大图，其中包含所有gray_col[index]的子图
+def gen_mapxmapy(H, sizewh):
+    (width, height)=sizewh
+    mapx = np.zeros((height, width), np.float32)
+    mapy = np.zeros((height, width), np.float32)
+    for y in range(height):
+        for x in range(width):
+            src = np.array([[x, y, 1]], dtype=np.float32)
+            dst = np.matmul(H, src.T)
+            mapx[y, x] = dst[0] / dst[2]
+            mapy[y, x] = dst[1] / dst[2]
+    return mapx, mapy
+def pltgriddata(A,B,firstN=10,Longt=False):
+    fig, axs = plt.subplots(2, 2, figsize=(10, 8))
+    if Longt:
+        axs[0, 0].scatter(A[:,0], A[:,1], c='blue')
+        axs[0, 0].set_title('Mapping from points_to_remap to cam_pro')
+        axs[0, 0].set_xlabel('x')
+        axs[0, 0].set_ylabel('y')
 
+        axs[0, 1].scatter(B[:,0], B[:,1], c='red')
+        axs[0, 1].set_title('Mapping from points_to_remap to cam_pro')
+        axs[0, 1].set_xlabel('x')
+        axs[0, 1].set_ylabel('y')
+
+    non_nan_idx = np.where(~np.isnan(A))[0]
+    points = A[non_nan_idx[:firstN]]
+    axs[1, 0].scatter(points[:,0], points[:,1])
+    for i in range(len(points)):
+        axs[1, 0].annotate(i, (points[i,0], points[i,1]))
+    axs[1, 0].set_title(f'the first {firstN} noNaN points cam_pro')
+
+    non_nan_idx = np.where(~np.isnan(B))[0]
+    points = B[non_nan_idx[:firstN]]
+    axs[1, 1].scatter(points[:,0], points[:,1])
+    for i in range(len(points)):
+        axs[1, 1].annotate(i, (points[i,0], points[i,1]))
+    axs[1, 1].set_title(f'the first {firstN} noNaN points cam_pro')
+
+    plt.tight_layout()
+    plt.show()
 
 def split_image(image):
     width, height = image.size

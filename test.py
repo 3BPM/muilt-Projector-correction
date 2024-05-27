@@ -3,8 +3,10 @@ import cv2, numpy as np
 import os,screeninfo
 from method.decode_gray import gray_decode
 from method.match import relation
+from method.fullscreenout import display_image_fullscreen
 import method.camera_screen as cs
 import datetime
+from capture_gray import gen_and_cap_gray
 now = datetime.datetime.now()
 date_str = now.strftime("%m%d")
 time_str = now.strftime("%H%M")
@@ -37,7 +39,6 @@ def Aruco_detect(gray):
     for i, idx in enumerate(ids):
         idx = int(idx)
         result[idx] = center_points[i]
-
     print('result is :',result)
     return result
 def myanchors(fourpointpath=""):#定义一个函数返回aruco标记中心点
@@ -54,7 +55,6 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-
 # Complete matching of projected image pixel coordinates to projector pixel coordinates
 def matching_test(images_folder, arucodir,ph_coordinate, parameters, pro_size, cam_size,type="aruco"):
     images_list = load_images_from_folder(images_folder)
@@ -77,29 +77,24 @@ def rendering_test(image, map_matrix, output_dir):
     for i,monitor in enumerate(monitors):
         print(f"{monitor.name} - Resolution: {monitor.width}x{monitor.height} - ID: {i}" )
     a=int(input("Enter monitor number: "))
-    screen = monitors[a]
     map_matrix=map_matrix[0]
     part = cv2.remap(image, map_matrix[0], map_matrix[1], interpolation=cv2.INTER_LINEAR)
     cv2.imwrite(f'{output_dir}/{a}.png', part)
+    display_image_fullscreen(f'{output_dir}/{a}.png',a)
 
-    width, height = screen.width, screen.height
-    cv2.namedWindow("result", cv2.WND_PROP_FULLSCREEN)
-    cv2.moveWindow("result", screen.x - 1, screen.y - 1)
-    cv2.setWindowProperty("result", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    img = cv2.imread(f'{output_dir}/{a}.png')
-    cv2.imshow('result', image)
-
-    cv2.waitKey(0)
-    cv2.imshow('result', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
+    '''python test.py --mode capturing
+python test.py --mode matching --shadow_thresh 80 --code_thresh 40 --projector_id 0 --ph_coordinate './data/phco.txt' --gray_folder './data/240415/captured/position_00a/' --match_np "./result/match.npy"
+python test.py --mode rendering
+'''
     pro_size = (1280,720)  # Projector image plane size 2560*640/3840)
-    
-    
+
+
     cam_size  =(1920, 1080) # Camera image plane size
-    arucodir=r'C:\Users\Administrator\Desktop\testapp\pic2.png'
+
+
+    arucodir=r'D:\muilt-Projector-correction\data\aruco2.png'
     parser = argparse.ArgumentParser(
     description='Projector correction')
     parser.add_argument('--shadow_thresh', type=int, default=10,
@@ -126,6 +121,8 @@ if __name__ == '__main__':
     parameters = [args.code_thresh, args.shadow_thresh, args.projector_id]
 
     os.makedirs("./result/", exist_ok=True)
+    if(args.mode=='capturing'):
+        gen_and_cap_gray()
     if(args.mode == 'matching'):
         map_matrix = matching_test(args.gray_folder, arucodir,args.ph_coordinate, parameters, pro_size, cam_size)
         np.save(args.match_np, map_matrix)

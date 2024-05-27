@@ -26,15 +26,15 @@ def display_image_fullscreen(image_path, monitor_id):
 
     # Display the resized image full screen on the specified monitor
     cv2.setWindowProperty(f'Screen {monitor_id}', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-    cv2.imshow(f'Screen {monitor_id}', resized_image)
+    cv2.imshow(f'Screen {monitor_id}', image)
 
 if __name__ == '__main__':
     # Example usage
-    image_path = r'C:\Users\Administrator\Desktop\muilt-Projector-correction\result\0.png'
-    monitor_id = 2  # Replace with the actual monitor ID you want to display on
 
-    display_image_fullscreen(image_path, monitor_id)
-    display_image_fullscreen(image_path, 0)
+
+    display_image_fullscreen('../1.png', 0)
+    #display_image_fullscreen('../result/0.png', 1)
+  #  display_image_fullscreen(r'C:\Users\Administrator\Desktop\muilt-Projector-correction\result\1.png', 2)
 
     # Wait for any key press to exit
     cv2.waitKey(0)
