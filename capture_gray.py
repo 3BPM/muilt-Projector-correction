@@ -3,7 +3,10 @@ import cv2, numpy as np
 import  screeninfo
 import datetime
 # import method.camera_screen as cs
-def gen_and_cap_gray(cam_id=0,cam_size = (1920, 1080),pattern_size = (1280,720),brightness=0,exposure=-7):
+import tools.ConfigManager
+c=tools.ConfigManager.ConfigManager()
+
+def gen_and_cap_gray(cam_id=0, cam_size=(1920, 1080), pattern_size=(1280, 720), brightness=0, exposure=-7):
     now = datetime.datetime.now()
     date_str = now.strftime("%m%d")
     time_str = now.strftime("%H%M")
@@ -12,6 +15,9 @@ def gen_and_cap_gray(cam_id=0,cam_size = (1920, 1080),pattern_size = (1280,720),
     pattern_dir = f'data/{date_str}/patterns_2'
     capture_dir = f'data/{date_str}{time_str}/captured/position_00/'
     log_file = os.path.join(pattern_dir, 'log.txt')
+
+
+
     if not os.path.exists(pattern_dir):
         os.makedirs(pattern_dir)
     if not os.path.exists(capture_dir):
@@ -66,20 +72,24 @@ def gen_and_cap_gray(cam_id=0,cam_size = (1920, 1080),pattern_size = (1280,720),
     monitors = screeninfo.get_monitors()
     for i,monitor in enumerate(monitors):
         print(f"{monitor.name} - Resolution: {monitor.width}x{monitor.height} - ID: {i}" )
-    id=int(input("Enter monitor number: "))
-    screen = monitors[id]
+    monitorid=int(input("Enter monitor number: "))
+    screen = monitors[monitorid]
     black_screen = np.zeros((100, 100, 3), dtype='uint8')
     black_screens = []
     for i,monitor in enumerate(monitors):
-        if i is not id:
+        if i is not monitorid:
             black_screens.append(monitor)
+    width, height = screen.width, screen.height
+
     with open(log_file, 'w') as f:
         #print('拍摄文件夹%r'%capture_dir, file=f)
         print(f"屏幕：{screen.name} - Resolution: {screen.width}x{screen.height} - 时间: {time_str}", file=f)
         print(f"拍摄文件夹：{capture_dir}", file=f)
         print(f"cam大小：{cam_size} bytes", file=f)
-        print(f"cam大小：{cam_size} bytes", file=f)
-    width, height = screen.width, screen.height
+        print(f"pattern大小：{pattern_size} bytes", file=f)
+        print(f"brightness:{ brightness}, 'exposure': {exposure}", file=f)
+    c.add_config(monitorid, cam_size, (width, height), capture_dir)
+
     cv2.namedWindow("GrayCode", cv2.WND_PROP_FULLSCREEN)
     cv2.moveWindow("GrayCode", screen.x - 1, screen.y - 1)
     cv2.setWindowProperty("GrayCode", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)

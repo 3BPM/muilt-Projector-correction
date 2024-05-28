@@ -19,7 +19,7 @@ class Stitcher:
             return None
 
         # 否则，提取匹配结果
-        # H是3x3视角变换矩阵      
+        # H是3x3视角变换矩阵
         (matches, H, status) = M
         # 将图片A进行视角变换，result是变换后图片
         result = cv2.warpPerspective(imageA, H, (imageA.shape[1] + imageB.shape[1], imageA.shape[0]))
@@ -59,7 +59,7 @@ class Stitcher:
     def matchKeypoints(self, kpsA, kpsB, featuresA, featuresB, ratio, reprojThresh):
         # 建立暴力匹配器
         matcher = cv2.BFMatcher()
-  
+
         # 使用KNN检测来自A、B图的SIFT特征匹配对，K=2
         rawMatches = matcher.knnMatch(featuresA, featuresB, 2)
 
@@ -104,11 +104,3 @@ class Stitcher:
 
         # 返回可视化结果
         return vis
-    def points_transform(self,points, matrix):
-    # Convert points to homogeneous coordinates 输入N,2维矩阵 和3x3投影矩阵
-        p1 = np.hstack([points, np.ones((len(points), 1))])
-        # Apply the transformation matrix
-        tp = p1.dot(matrix.T)
-        # Convert back to Cartesian coordinates
-        transformed_points_cartesian = tp[:, :2] / tp[:, [2]]
-        return transformed_points_cartesian

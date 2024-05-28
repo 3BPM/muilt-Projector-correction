@@ -3,15 +3,15 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.dirname(__file__))))  # 
 import method.camera_screen as cs
 import cv2
 import numpy as np
+import resize
 rate=0.08
 # 读取图像
-cam= cs.Camera("uvc")
-img =  cam.read()
+img =  cv2.imread("tools/cam2275x1280.jpg")
 
 
 # 转换为灰度图
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-cv2.imshow("【2】灰度图", gray)
+resize.resize_and_show("【2】灰度图", gray)
 
 # Canny 边缘检测
 edges = cv2.Canny(gray, 10, 70)
@@ -26,8 +26,8 @@ img2 = img.copy()
 for cnt in contours:
     cv2.drawContours(img2, [cnt], 0, (0, 0, 255), 2)
 # 保存结果
-cv2.imshow("All Contours", img2)
-cv2.imshow("All edges", edges)
+resize.resize_and_show("All Contours", img2)
+resize.resize_and_show("All edges", edges)
 height, width = edges.shape[:2]
 # 对轮廓图进行霍夫直线检测
 # lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, maxLineGap=250)
@@ -66,7 +66,7 @@ for line in lines:
     cv2.line(line_img, (x1, y1), (x2, y2), (0, 0, 255), 1)
 
 # 显示直线检测结果
-cv2.imshow("Hough Lines", line_img)
+resize.resize_and_show("Hough Lines", line_img)
 top_line = None
 bottom_line = None
 left_line = None
@@ -121,7 +121,7 @@ else:
     print("Bottom line not detected")
 
 
-cv2.imshow("Inner Lines", line_img)
+resize.resize_and_show("Inner Lines", line_img)
 
 # 遍历所有轮廓
 max_area = 0
@@ -144,5 +144,5 @@ if max_cnt is not None:
 
 # 保存结果
 cv2.imwrite("data/rectangle_contours.jpg", img)
-cv2.imshow("Aruco Codes", img)
+resize.resize_and_show("Aruco Codes", img)
 cv2.waitKey(0)

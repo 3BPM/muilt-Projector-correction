@@ -3,8 +3,8 @@ import cv2
 
 # 读取拼接图片
 
-imageA = cv2.imread("otherdemos/left_01.png")
-imageB = cv2.imread("otherdemos/right_01.png")
+imageA = cv2.imread("tools/left_01.png")
+imageB = cv2.imread("tools/right_01.png")
 
 # 把图片拼接成全景图
 stitcher = Stitcher()

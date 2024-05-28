@@ -5,6 +5,34 @@ import cv2,os, numpy as np
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon, box,MultiPolygon
 from shapely.ops import unary_union
+def points_transform(self,points, matrix):
+# Convert points to homogeneous coordinates 输入N,2维矩阵 和3x3投影矩阵
+#等效于perspectiveTransform
+    p1 = np.hstack([points, np.ones((len(points), 1))])
+    # Apply the transformation matrix
+    tp = p1.dot(matrix.T)
+    # Convert back to Cartesian coordinates
+    transformed_points_cartesian = tp[:, :2] / tp[:, [2]]
+    return transformed_points_cartesian
+
+def ptstoH(ptsP,ptsC,isinv=False,israns=True):
+    if israns:
+        reprojThresh=-10
+        (H, status) = cv2.findHomography(ptsP, ptsC, cv2.RANSAC, reprojThresh)
+    else:
+        (H, status) = cv2.findHomography(ptsP, ptsC)
+
+    scale_matrix = np.array([[1920/1280, 0, 0],
+                            [0, 1080/720, 0],
+                            [0, 0, 1]])
+    scale_matrix=np.linalg.inv(scale_matrix)
+
+    if isinv:
+        return np.linalg.inv(H)
+    else:
+        return H
+
+
 # 创建一个大图，其中包含所有gray_col[index]的子图
 def gen_mapxmapy(H, sizewh):
     (width, height)=sizewh
@@ -123,6 +151,9 @@ def cv_show(name,img):
     cv2.imshow(name,img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+def show( img):
+        plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), aspect='equal')
 def plt_show(name,img):
     plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), aspect='equal')
     plt.title(name)
